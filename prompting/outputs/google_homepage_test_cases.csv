@@ -1,0 +1,9 @@
+Test ID,Title,Preconditions,Steps,Expected Result
+FT-WEB-001,Verify search functionality using 'Google Search' button,Google homepage is loaded on a web browser,1. Enter 'OpenAI' in the search box. 2. Click on 'Google Search' button.,Search results related to 'OpenAI' are displayed.
+FT-WEB-002,Verify 'I'm Feeling Lucky' button functionality,Google homepage is loaded on a web browser,1. Enter 'OpenAI' in the search box. 2. Click on 'I'm Feeling Lucky' button.,User is redirected to the first result's website.
+NFT-WEB-001,Verify homepage load time,A stable internet connection,1. Open the Google homepage in a web browser.,Homepage loads within 2 seconds.
+NFT-WEB-002,Verify UI responsiveness across devices,"Access Google homepage on different screen sizes (desktop, tablet, mobile)",1. Resize the browser window or use developer tools to simulate various devices.,UI elements adjust properly without overlapping or distortion.
+FT-MOB-001,Verify voice search functionality on mobile,Google homepage is loaded on a mobile browser,1. Click on the microphone icon. 2. Speak 'OpenAI'.,"Voice input is processed, and search results for 'OpenAI' are displayed."
+NFT-MOB-001,Verify app performance on low-speed network,Mobile device connected to a 3G network,1. Open Google homepage in a mobile browser.,Google homepage loads within acceptable time (under 5 seconds).
+BT-001,Verify backend response for valid search query,Google search service is running,1. Send a valid search query ('OpenAI') to the backend API.,API responds with a 200 status and a list of search results.
+BT-002,Verify error handling for invalid search query,Google search service is running,"1. Send an invalid query (e.g., special characters or empty query) to the backend API.",API responds with an appropriate error message or default search results.

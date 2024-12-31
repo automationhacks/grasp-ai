@@ -1,0 +1,12 @@
+Test ID,Title,Preconditions,Steps,Expected Result
+FT-WEB-001,Verify 'Google Search' functionality with valid input,Google homepage loaded on a desktop browser,1. Enter 'OpenAI' in the search box. 2. Click 'Google Search'.,Search results related to 'OpenAI' are displayed.
+FT-MOB-002,Verify voice search functionality on mobile,Google homepage loaded on a mobile browser with microphone access enabled,1. Tap the microphone icon. 2. Speak 'OpenAI'.,Search results related to 'OpenAI' are displayed.
+FT-BACK-003,Verify autocomplete suggestions,Backend service running,1. Enter 'Open' in the search box. 2. Observe suggestions.,Relevant autocomplete suggestions are displayed.
+NFT-PERF-001,Verify homepage load time on desktop,Stable internet connection,1. Open Google homepage on a desktop browser.,Homepage loads within 2 seconds.
+NFT-RESP-002,Verify responsiveness on tablet,Google homepage loaded on a tablet browser,1. Rotate the screen to landscape mode. 2. Check UI alignment.,UI adjusts without overlapping or distortion.
+SEC-WEB-001,Verify XSS protection in search box,Google homepage loaded on any browser,1. Enter '<script>alert(1)</script>' in the search box. 2. Click 'Google Search'.,"Input is sanitized, and no script is executed."
+SEC-BACK-002,Verify SQL injection protection,Backend service running,1. Send a query containing 'OR 1=1' to the backend API.,No unauthorized access or data exposure occurs.
+ACC-WEB-001,Verify keyboard navigation for search functionality,Google homepage loaded on a desktop browser,1. Use the 'Tab' key to navigate to the search box. 2. Enter 'OpenAI'. 3. Press 'Enter'.,"Search results for 'OpenAI' are displayed, with no reliance on a mouse."
+ACC-MOB-002,Verify screen reader compatibility,Screen reader enabled on mobile,1. Open Google homepage. 2. Navigate through the page elements using the screen reader.,"All elements are read correctly, and actions are accessible."
+USAB-WEB-001,Verify usability of 'I'm Feeling Lucky' button,Google homepage loaded on a desktop browser,1. Enter 'OpenAI' in the search box. 2. Click 'I'm Feeling Lucky'.,User is redirected to the most relevant result's website.
+USAB-MOB-002,Verify ease of accessing voice search on mobile,Google homepage loaded on a mobile browser,1. Locate and tap the microphone icon.,Voice search is easily accessible without confusion.
