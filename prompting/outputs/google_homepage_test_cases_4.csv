@@ -1,0 +1,15 @@
+Test ID,Title,Preconditions,Steps,Expected Result
+RT-BACK-01,Verify system behavior when the search API is unavailable,Backend API service is temporarily shut down,"1. Send a valid search request (e.g., 'OpenAI').
+2. Observe the system response.","The system returns an appropriate error message (e.g., 'Service temporarily unavailable') with a 503 HTTP status code."
+RT-BACK-02,Verify system behavior during high latency in API responses,"Introduce artificial delay (e.g., 5 seconds) in backend API responses","1. Send a valid search request (e.g., 'OpenAI').
+2. Measure the time taken for the response.","The system handles the delay gracefully, displaying a loading indicator or retry mechanism without crashing."
+RT-BACK-03,Verify system response when the database is inaccessible,Simulate a database connection failure in the backend,"1. Send a valid search request (e.g., 'OpenAI').
+2. Observe the system response.",The system returns an appropriate error message and logs the database connection issue for further debugging.
+RT-BACK-04,Verify search API response when dependent services fail,"Simulate failure in a dependent service (e.g., autocomplete or suggestion service)","1. Send a valid search request (e.g., 'OpenAI').
+2. Observe the response for missing or degraded functionality.","The API returns search results without suggestions, with an appropriate warning or degraded service notice."
+RT-BACK-05,Verify API stability under sudden high request volume,Backend API service is operational,"1. Simulate a surge of 10,000 requests per second to the API.
+2. Monitor the system response and service stability.","The system handles the load gracefully, rejecting excessive requests with a 429 status code (Too Many Requests) while maintaining stability for other users."
+RT-BACK-06,Verify API response for malformed requests,Backend API service is running,"1. Send a malformed search request (e.g., invalid JSON or missing required parameters).
+2. Observe the system response.",The API returns a clear error message with a 400 HTTP status code (Bad Request) and logs the issue for analysis.
+RT-BACK-07,Verify circuit breaker functionality during persistent failures,Simulate backend API failure for 10 consecutive requests,"1. Continuously send valid search requests while the API is down.
+2. Observe when the circuit breaker is triggered.","The system halts requests temporarily and retries after a set time, ensuring minimal strain on the service."
