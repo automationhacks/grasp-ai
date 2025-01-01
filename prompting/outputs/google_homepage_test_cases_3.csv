@@ -1,0 +1,17 @@
+Test ID,Title,Preconditions,Steps,Expected Result
+FT-WEB-01,Test Google search for valid search parameters,Given Google search page is loaded on a desktop browser,"1. User types a valid search query (e.g., 'OpenAI') in the search box.
+2. User clicks the 'Google Search' button.",Google search results page shows relevant results.
+FT-WEB-02,Test 'I'm Feeling Lucky' with a valid query,Given Google search page is loaded on a desktop browser,"1. User types a valid query (e.g., 'OpenAI') in the search box.
+2. User clicks the 'I'm Feeling Lucky' button.",User is redirected to the most relevant result's webpage.
+FT-WEB-03,Test empty input handling on desktop,Given Google search page is loaded on a desktop browser,"1. User leaves the search box empty.
+2. User clicks the 'Google Search' button.",No search results are shown; user remains on the homepage with an appropriate message.
+FT-MOB-01,Test Google search for valid inputs on mobile browser,Given Google search page is loaded on a mobile browser,"1. User types 'OpenAI' in the search box.
+2. User clicks the 'Google Search' button.",Google search results page shows relevant results.
+FT-MOB-02,Test voice search functionality,Given Google search page is loaded on a mobile browser with microphone permissions enabled,"1. User taps the microphone icon.
+2. User speaks a query (e.g., 'OpenAI').",Search results relevant to the spoken query are displayed.
+FT-BACK-01,Test backend response for valid search query,Google backend search service is running,"1. Send a valid search query (e.g., 'OpenAI') to the backend API.
+2. Verify the response.",Backend returns search results related to 'OpenAI' with a 200 HTTP status code.
+FT-BACK-02,Test backend response for an invalid search query,Google backend search service is running,"1. Send an invalid search query (e.g., special characters '@#$%^&*').
+2. Verify the response.",Backend returns an appropriate error message or an empty result set with a 200 HTTP status code.
+FT-BACK-03,Test backend handling of excessively long queries,Google backend search service is running,"1. Send an excessively long query (e.g., 10,000 characters) to the backend API.
+2. Verify the response.","Backend handles the request gracefully, returning either truncated results or an appropriate error message without crashing."
