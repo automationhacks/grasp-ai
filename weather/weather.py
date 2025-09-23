@@ -90,3 +90,7 @@ Forecast: {period['detailedForecast']}
         forecasts.append(forecast)
 
     return "\n---\n".join(forecasts)
+
+
+if __name__ == "__main__":
+    mcp.run(transport='stdio')
