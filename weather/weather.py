@@ -10,6 +10,9 @@ USER_AGENT = "weather-app/1.0"
 
 
 async def make_nws_request(url: str) -> dict[str, Any] | None:
+    """
+    Make a request to the NWS API and return the JSON response.
+    """
     headers = {
         "User-Agent": USER_AGENT,
         "Accept": "application/geo+json"
