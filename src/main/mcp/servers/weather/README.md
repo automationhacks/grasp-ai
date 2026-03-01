@@ -24,6 +24,36 @@ If you use Claude desktop, then add below to `code ~/Library/Application\ Suppor
 }
 ```
 
+If you are using VSCode
+
+```json
+{
+  "servers": {
+    "weather-mcp": {
+      "type": "stdio",
+      "command": "/Users/gauravsingh/.local/bin/uv",
+      "args": [
+        "run",
+        "--with",
+        "mcp[cli]",
+        "mcp",
+        "run",
+        "/Users/gauravsingh/self/grasp-ai/src/main/mcp/servers/weather/weather.py"
+      ]
+    }
+  },
+  "inputs": []
+}
+```
+
+## MCP inspector
+
+```
+npx @modelcontextprotocol/inspector \
+  /Users/gauravsingh/.local/bin/uv \
+  run /Users/gauravsingh/self/grasp-ai/src/main/mcp/servers/weather/weather.py
+```
+
 ## Workflow
 
 Once configured
