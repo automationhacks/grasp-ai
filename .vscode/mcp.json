@@ -8,6 +8,10 @@
 			],
 			"gallery": "https://api.mcp.github.com",
 			"version": "0.0.1-seed"
+		},
+		"calculator-mcp": {
+			"url": "http://localhost:8000/mcp",
+			"type": "http"
 		}
 	},
 	"inputs": []
