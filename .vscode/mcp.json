@@ -1,18 +1,22 @@
 {
-	"servers": {
-		"microsoft/playwright-mcp": {
-			"type": "stdio",
-			"command": "npx",
-			"args": [
-				"@playwright/mcp@latest"
-			],
-			"gallery": "https://api.mcp.github.com",
-			"version": "0.0.1-seed"
-		},
-		"calculator-mcp": {
-			"url": "http://localhost:8000/mcp",
-			"type": "http"
-		}
-	},
-	"inputs": []
+  "servers": {
+    "microsoft/playwright-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    },
+    "weather-mcp": {
+      "type": "stdio",
+      "command": "/Users/gauravsingh/.local/bin/uv",
+      "args": [
+        "run",
+        "--with",
+        "mcp[cli]",
+        "mcp",
+        "run",
+        "/Users/gauravsingh/self/grasp-ai/src/main/mcp/servers/weather/weather.py"
+      ]
+    }
+  },
+  "inputs": []
 }
