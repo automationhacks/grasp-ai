@@ -48,7 +48,7 @@ If you are using VSCode
 
 ## MCP inspector
 
-```
+```bash
 npx @modelcontextprotocol/inspector \
   /Users/gauravsingh/.local/bin/uv \
   run /Users/gauravsingh/self/grasp-ai/src/main/mcp/servers/weather/weather.py
