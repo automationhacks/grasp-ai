@@ -55,16 +55,23 @@ def main():
 
     # Stream the response token by token
     print("Assistant: ", end="", flush=True)
-    for chunk in client.complete_streaming_chat(messages):
-        content = chunk.choices[0].delta.content
-        if content:
-            print(content, end="", flush=True)
-    print()
+    try:
+        for chunk in client.complete_streaming_chat(messages):
+            if not chunk.choices:
+                continue
+            choice = chunk.choices[0]
+            if not choice.delta:
+                continue
+            content = getattr(choice.delta, "content", None)
+            if content:
+                print(content, end="", flush=True)
+        print()
+    finally:
+        # Clean up even if streaming fails
+        model.unload()
+        print("Model unloaded.")
 
-    # Clean up
-    model.unload()
-    print("Model unloaded.")
 
-
+# The first run would take time for the model to download and would be a bit slow
 if __name__ == '__main__':
     main()
