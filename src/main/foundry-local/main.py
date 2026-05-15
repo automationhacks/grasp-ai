@@ -1,5 +1,5 @@
 def main():
-    print("Hello from grasp-ai!")
+    print("Hello from foundry-local!")
 
 
 if __name__ == "__main__":
