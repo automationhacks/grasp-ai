@@ -1,0 +1,10 @@
+[project]
+name = "tutorial-tool-calling"
+version = "0.1.0"
+description = "How to create an AI assistant that uses tool calling using Foundry local sdk"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "foundry-local-sdk>=1.1.0",
+    "openai>=2.36.0",
+]
