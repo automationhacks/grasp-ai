@@ -6,7 +6,7 @@ manager = FoundryLocalManager.instance
 
 current_ep = ""
 
-# Download and register all execution providers
+# Download and register all execution providers (ep)
 
 
 def ep_progress(ep_name: str, percent: float):
