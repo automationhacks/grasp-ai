@@ -18,3 +18,11 @@ uv sync
 # Check packages are installed in pip
 uv pip list
 ```
+
+## Running the agent
+
+Run below command to run the AI agent and then chat naturally:
+
+```shell
+uv run main.py
+```

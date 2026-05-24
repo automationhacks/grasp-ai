@@ -59,7 +59,8 @@ def main():
         full_response = ""
 
         for chunk in client.complete_streaming_chat(messages):
-            content = chunk.choices[0].delta.content
+            if len(chunk.choices) > 0:
+                content = chunk.choices[0].delta.content
             if content:
                 print(content, end="", flush=True)
                 full_response += content
