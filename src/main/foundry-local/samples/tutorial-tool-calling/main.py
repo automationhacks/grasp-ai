@@ -27,6 +27,25 @@ tools = [
             }
         }
     },
+    {
+        "type": "function",
+        "function": {
+            "name": "calculate",
+            "description": "Perform a math calculation",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "expression": {
+                        "type": "string",
+                        "description": (
+                            "The math expression to evaluate"
+                        )
+                    }
+                },
+                "required": ["expression"]
+            }
+        }
+    }
 ]
 
 
@@ -39,8 +58,21 @@ def get_weather(location, unit='celsius'):
     }
 
 
+def calculate(expression):
+    allowed = set('0123456789+-*/(). ')
+    if not all(char in allowed for char in expression):
+        return {"error": "Invalid expression"}
+
+    try:
+        result = eval(expression)
+        return {"expression": expression, "result": result}
+    except Exception as e:
+        return {"error": str(e)}
+
+
 tool_functions = {
-    "get_weather": get_weather
+    "get_weather": get_weather,
+    "calculate": calculate
 }
 
 

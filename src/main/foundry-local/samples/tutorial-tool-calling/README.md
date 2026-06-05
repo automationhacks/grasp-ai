@@ -1,5 +1,8 @@
 # AI Assistant with tool calling
 
+- You can define tools as functions with their schema in a JSON file
+- With tool calling, model can request to run a function and return the result
+
 ## Setup
 
 We are using `uv` for package management, follow [installation](https://docs.astral.sh/uv/getting-started/installation/) steps for your platform
@@ -17,4 +20,11 @@ uv sync
 uv pip list
 ```
 
-##
+This project uses below dependencies
+
+```toml
+dependencies = [
+    "foundry-local-sdk>=1.1.0",
+    "openai>=2.36.0",
+]
+```
