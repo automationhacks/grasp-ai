@@ -1,7 +1,10 @@
 # AI Assistant with tool calling
 
 - You can define tools as functions with their schema in a JSON file
-- With tool calling, model can request to run a function and return the result
+- With tool calling, model can request to run a function
+- It does not run functions directly, it returns a tool call request with function name and arguments
+- Your code runs the function
+- and model then returns the result
 
 ## Setup
 

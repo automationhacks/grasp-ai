@@ -1,5 +1,76 @@
+from foundry_local_sdk import Configuration, FoundryLocalManager
+
+
 def main():
-    print("Hello from tutorial-tool-calling!")
+    # Initialize Foundry Local sdk
+    config = Configuration(app_name="foundry_local_samples")
+    FoundryLocalManager.initialize(config)
+    manager = FoundryLocalManager.instance
+
+    # Download and register all execution providers
+    current_ep = ""
+
+    def ep_progress(ep_name: str, percent: float):
+        nonlocal current_ep
+        if ep_name != current_ep:
+            if current_ep:
+                print()
+            current_ep = ep_name
+        print(f"\r {ep_name:<30} {percent:5.1f}%", end="", flush=True)
+
+    manager.download_and_register_eps(progress_callback=ep_progress)
+    if current_ep:
+        print()
+
+    model = manager.catalog.get_model("qwen2.5-0.5b")
+    model.download(
+        lambda progress: print(
+            f"\rDownloading model: {progress:.2f}%",
+            end="",
+            flush=True
+        )
+    )
+    print()
+    model.load()
+    print("Model loaded and ready.")
+
+    # Get a chat client
+    client = model.get_chat_client()
+
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                "You are a helpful assistant with access to tools. "
+                "Use them when needed to answer questions accurately. "
+            )
+        }
+    ]
+
+    print("\nTool-calling assistant ready! Type 'quit' to exit.\n")
+
+    while True:
+        user_input = input("You: ")
+        if user_input.strip().lower() in ("quit", "exit"):
+            break
+
+        messages.append({
+            "role": "user",
+            "content": user_input
+        })
+
+        response = client.complete_chat(messages, tools=tools)
+        answer = process_tool_calls(messages, response, client)
+
+        messages.append({
+            "role": "assistant",
+            "content": answer
+        })
+        print(f"Assistant: {answer}\n")
+
+    # Clean up
+    model.unload()
+    print("Model unloaded. Goodbye")
 
 
 # Each tool describes tools name and description
@@ -31,7 +102,9 @@ tools = [
         "type": "function",
         "function": {
             "name": "calculate",
+            # description helps a model decide when to use it
             "description": "Perform a math calculation",
+            # parameters describe the expected input
             "parameters": {
                 "type": "object",
                 "properties": {
