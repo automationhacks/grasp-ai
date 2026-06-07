@@ -73,6 +73,58 @@ def main():
     print("Model unloaded. Goodbye")
 
 
+def process_tool_calls(messages, response, client):
+    """
+    Handles tool calls. There are 4 steps involved:
+
+    1. We detect tool_calls by looking into response.choices[0].message.tool_calls
+    2. Execute the function - parse the arguments and call your local function
+    3. Return the answer - add a message with role as `tool` and matching `tool_call_id`
+    4. Get the final answer - model will use tool result to generate natural response
+    """
+
+    choice = response.choices[0].message
+
+    while choice.tool_calls:
+        # Convert the assistant message to a dict for the SDK
+        assistant_msg = {
+            "role": "assistant",
+            "content": choice.content,
+            "tool_calls": [
+                {
+                    "id": tc.id,
+                    "type": tc.type,
+                    "function": {
+                        "name": tc.function.name,
+                        "arguments": tc.function.arguments
+                    }
+                }
+                for tc in choice.tool_calls
+            ],
+        }
+        messages.append(assistant_msg)
+
+        for tool_call in choice.tool_calls:
+            function_name = tool_call.function.name
+            arguments = json.loads(tool_call.function.arguments)
+            print(f"  Tool call: {function_name}({arguments})")
+
+            # Execute the function and add the result
+            func = tool_functions[function_name]
+            result = func(**arguments)
+            messages.append({
+                "role": "tool",
+                "tool_call_id": tool_call.id,
+                "content": json.dumps(result)
+            })
+
+            # Send the updated conversation back
+            response = client.complete_chat(messages, tools=tools)
+            choice = response.choices[0].message
+
+    return choice.content
+
+
 # Each tool describes tools name and description
 # and parameters that describes expected input for each parameters
 tools = [
