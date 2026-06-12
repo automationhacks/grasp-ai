@@ -174,3 +174,4 @@ cython_debug/
 
 # Ignore raw media files
 *.mp3
+*.wav

@@ -29,11 +29,26 @@ def main():
 
     # Transcribe the audio file
     audio_client = speech_model.get_audio_client()
-    transcription = audio_client.transcribe("sample.mp3")
+    transcription = audio_client.transcribe("sample.wav")
     print(f"\nTranscription:\n{transcription.text}")
 
     # Unload the speech model to free memory
     speech_model.unload()
+
+    # Download and register all execution providers (ep)
+    current_ep = ""
+
+    def ep_progress(ep_name: str, percent: float):
+        nonlocal current_ep
+        if ep_name != current_ep:
+            if current_ep:
+                print()
+            current_ep = ep_name
+        print(f'\r {ep_name:<30} {percent:5.1f}%', end="", flush=True)
+
+    manager.download_and_register_eps(progress_callback=ep_progress)
+    if current_ep:
+        print()
 
     # Load the chat model for summarization
     chat_model = manager.catalog.get_model("qwen2.5-0.5b")
