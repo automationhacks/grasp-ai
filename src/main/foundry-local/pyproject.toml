@@ -15,4 +15,5 @@ members = [
     "samples/tutorial-tool-calling",
     "samples/rag-application",
     "samples/voice-to-text-note-taker",
+    "samples/document-summarizer",
 ]
