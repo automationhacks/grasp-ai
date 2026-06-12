@@ -14,4 +14,5 @@ members = [
     "samples/multi-turn-chat-assistant",
     "samples/tutorial-tool-calling",
     "samples/rag-application",
+    "samples/voice-to-text-note-taker",
 ]
