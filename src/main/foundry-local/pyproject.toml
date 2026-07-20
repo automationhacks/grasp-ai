@@ -16,4 +16,6 @@ members = [
     "samples/rag-application",
     "samples/voice-to-text-note-taker",
     "samples/document-summarizer",
+    "samples",
+    "samples/local-ai",
 ]
