@@ -35,7 +35,7 @@ model.download(
     )
 )
 print()
-model.load()
+model.load( )
 print("Model loaded.")
 
 try:
@@ -71,7 +71,7 @@ try:
             if choice.delta and choice.delta.content:
                 print(choice.delta.content, end="", flush=True)
     print()
-    print("Press Ctrl+C to exit.")
+    input("Press Ctrl+C to exit.")
 
 except KeyboardInterrupt:
     print("\nBye bye...")
