@@ -1,8 +1,8 @@
 import os
 
-from azure.identity import DefaultAzureCredential
 from azure.ai.projects import AIProjectClient
 from azure.ai.projects.models import PromptAgentDefinition
+from azure.identity import DefaultAzureCredential
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -13,13 +13,11 @@ project = AIProjectClient(
 )
 
 agent = project.agents.create_version(
-    agent_name="basic-agent",
+    agent_name="basic-agent-01",
     definition=PromptAgentDefinition(
         model="gpt-5.4-mini",
         instructions="""
-        You are a helpful assistant that answers questions about Software Testing. 
-        If the user asks you a question about any other topic, 
-        just politely decline and tell them you can only answer questions on Testing.""",
+        You are a helpful assistant that answers questions about any topic.""",
     ),
 )
 print(f"Agent created (id: {agent.id}, name: {agent.name}, version: {agent.version})")
