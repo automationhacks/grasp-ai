@@ -12,6 +12,7 @@ project = AIProjectClient(
     endpoint=PROJECT_ENDPOINT, credential=DefaultAzureCredential()
 )
 
+# Create an Agent with a model and instructions
 agent = project.agents.create_version(
     agent_name="basic-agent-01",
     definition=PromptAgentDefinition(

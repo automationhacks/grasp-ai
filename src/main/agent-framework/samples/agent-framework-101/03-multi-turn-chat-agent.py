@@ -12,7 +12,9 @@ project = AIProjectClient(
     endpoint=PROJECT_ENDPOINT,
     credential=DefaultAzureCredential(),
 )
+# Gets open ai client mapped to already created agent in foundry
 openai = project.get_openai_client(agent_name="basic-agent-01")
+# create first coversation
 conversation = openai.conversations.create()
 
 response = openai.responses.create(
@@ -20,6 +22,8 @@ response = openai.responses.create(
 )
 print(response.output_text)
 
+# ask a follow up question, the agent remembers past conversations and
+# can respond accordingly
 response = openai.responses.create(
     conversation=conversation.id, input="And what is the capital city?"
 )
