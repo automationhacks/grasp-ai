@@ -181,3 +181,6 @@ cython_debug/
 
 # Environment files
 .env
+
+# Agent files
+src/main/agent-framework/samples/agent-framework-101/agent-file-memory/
