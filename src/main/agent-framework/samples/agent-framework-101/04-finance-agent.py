@@ -1,7 +1,18 @@
-import datetime
+"""
+This file follows tutorial from agent-framework on building your own agent with harness
+https://github.com/microsoft/agent-framework/blob/main/python/samples/02-agents/harness/build_your_own_claw/claw_step01_meet_your_claw.py
+
+It also makes use of console which is a terminal UI (TUI)
+https://github.com/microsoft/agent-framework/tree/main/python/samples/02-agents/harness/console
+"""
+
+import asyncio
+import importlib
 import os
 import random
-from time import timezone
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import Annotated
 
 from agent_framework import create_harness_agent
@@ -9,9 +20,35 @@ from agent_framework.foundry import FoundryChatClient
 from azure.identity import AzureCliCredential
 from dotenv import load_dotenv
 
+# Reuse the shared harness console from a local agent-framework repo checkout.
+DEFAULT_HARNESS_DIR = (
+    Path.home()
+    / "self"
+    / "agent-framework"
+    / "python"
+    / "samples"
+    / "02-agents"
+    / "harness"
+)
+HARNESS_DIR = Path(
+    os.environ.get("AGENT_FRAMEWORK_HARNESS_DIR", str(DEFAULT_HARNESS_DIR))
+).expanduser()
+if HARNESS_DIR.exists():
+    sys.path.insert(0, str(HARNESS_DIR))
+else:
+    raise RuntimeError(
+        "Harness directory not found. Set AGENT_FRAMEWORK_HARNESS_DIR to "
+        "<agent-framework>/python/samples/02-agents/harness"
+    )
+
+console_module = importlib.import_module("console")
+build_observers_with_planning = console_module.build_observers_with_planning
+run_agent_async = console_module.run_agent_async
+
 load_dotenv()
 # Config
 PROJECT_ENDPOINT = os.environ.get("PROJECT_ENDPOINT")
+FOUNDRY_MODEL = os.environ.get("FOUNDRY_MODEL")
 
 # instructions
 FINANCE_INSTRUCTIONS = """\
@@ -60,8 +97,6 @@ def get_stock_price(
 
 # Setup
 client = FoundryChatClient(
-    project_endpoint=PROJECT_ENDPOINT,
-    model="gpt5.4-mini",
     credential=AzureCliCredential(),
 )
 
@@ -69,3 +104,17 @@ client = FoundryChatClient(
 agent = create_harness_agent(
     client=client, agent_instructions=FINANCE_INSTRUCTIONS, tools=get_stock_price
 )
+
+
+async def main() -> None:
+    await run_agent_async(
+        agent=agent,
+        session=agent.create_session(),
+        observers=build_observers_with_planning(agent),
+        initial_mode="plan",
+        title="Finance Assistant",
+    )
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
