@@ -16,7 +16,12 @@ from pathlib import Path
 from typing import Annotated, Literal
 from uuid import uuid4
 
-from agent_framework import FileSystemAgentFileStore, create_harness_agent, tool
+from agent_framework import (
+    FileAccessProvider,
+    FileSystemAgentFileStore,
+    create_harness_agent,
+    tool,
+)
 from agent_framework.foundry import FoundryChatClient
 from azure.identity import AzureCliCredential
 from dotenv import load_dotenv
@@ -131,6 +136,7 @@ agent = create_harness_agent(
     agent_instructions=FINANCE_INSTRUCTIONS,
     tools=[get_stock_price, place_trade],
     file_access_store=FileSystemAgentFileStore("working"),
+    auto_approval_rules=[FileAccessProvider.read_only_tools_auto_approval_rule],
 )
 
 
