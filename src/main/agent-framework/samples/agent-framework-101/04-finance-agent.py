@@ -15,7 +15,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Annotated
 
-from agent_framework import create_harness_agent
+from agent_framework import FileSystemAgentFileStore, create_harness_agent
 from agent_framework.foundry import FoundryChatClient
 from azure.identity import AzureCliCredential
 from dotenv import load_dotenv
@@ -63,6 +63,11 @@ commentary.
 - Cite web sources inline when you use them.
 - Keep the user's watchlist in a memory file called `watchlist.md`: read it when reviewing the
   watchlist, and update it whenever the user adds or removes a ticker.
+
+The user’s holdings live in a file called portfolio.csv. 
+Read it before answering questions about their portfolio, and never modify it unless asked. 
+When asked for a report, write it to a Markdown file (e.g. reports/portfolio-review.md) and 
+tell the user where you saved it.
 """
 
 # constants
@@ -102,7 +107,10 @@ client = FoundryChatClient(
 
 # Agent harness
 agent = create_harness_agent(
-    client=client, agent_instructions=FINANCE_INSTRUCTIONS, tools=get_stock_price
+    client=client,
+    agent_instructions=FINANCE_INSTRUCTIONS,
+    tools=[get_stock_price],
+    file_access_store=FileSystemAgentFileStore("working"),
 )
 
 
