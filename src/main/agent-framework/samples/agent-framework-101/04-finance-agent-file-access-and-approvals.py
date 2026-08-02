@@ -13,12 +13,14 @@ import random
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Literal
+from uuid import uuid4
 
-from agent_framework import FileSystemAgentFileStore, create_harness_agent
+from agent_framework import FileSystemAgentFileStore, create_harness_agent, tool
 from agent_framework.foundry import FoundryChatClient
 from azure.identity import AzureCliCredential
 from dotenv import load_dotenv
+from pydantic import Field
 
 # Reuse the shared harness console from a local agent-framework repo checkout.
 DEFAULT_HARNESS_DIR = (
@@ -105,6 +107,17 @@ def get_stock_price(
         "currency": "USD",
         "as_of": datetime.now(timezone.utc).isoformat(),
     }
+
+
+@tool(approval_mode="always_require")
+def place_trade(
+    symbol: Annotated[str, "Stock ticker symbol to trade. e.g. MSFT"],
+    action: Annotated[Literal["buy", "sell"], "Either 'buy' or 'sell'"],
+    quantity: Annotated[int, Field(gt=0, description="The number of shares to trade")],
+):
+    verb = "Sold" if action == "sell" else "Bought"
+    confirmation = f"TRADE-{uuid4().hex[:8].upper()}"
+    return f"{verb} {quantity} shares of {symbol.upper()}. Confirmation: {confirmation}"
 
 
 # Setup
