@@ -129,7 +129,7 @@ client = FoundryChatClient(
 agent = create_harness_agent(
     client=client,
     agent_instructions=FINANCE_INSTRUCTIONS,
-    tools=[get_stock_price],
+    tools=[get_stock_price, place_trade],
     file_access_store=FileSystemAgentFileStore("working"),
 )
 
