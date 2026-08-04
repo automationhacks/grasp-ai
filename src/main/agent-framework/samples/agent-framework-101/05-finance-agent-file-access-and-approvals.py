@@ -17,6 +17,7 @@ from typing import Annotated, Literal
 from uuid import uuid4
 
 from agent_framework import (
+    Content,
     FileAccessProvider,
     FileSystemAgentFileStore,
     create_harness_agent,
@@ -125,6 +126,19 @@ def place_trade(
     return f"{verb} {quantity} shares of {symbol.upper()}. Confirmation: {confirmation}"
 
 
+# auto approval rules
+async def auto_approve_small_trades(call: Content) -> bool:
+    if call.name != "place_trade":
+        return False
+
+    args = call.parse_arguments() or {}
+    qty = int(args.get("quantity", 0))
+    stock_price = get_stock_price(args["symbol"])
+    estimate = qtr * stock_price
+    # A trade less than $1000 can be auto approved.
+    return estimate < 1000
+
+
 # Setup
 client = FoundryChatClient(
     credential=AzureCliCredential(),
@@ -136,7 +150,10 @@ agent = create_harness_agent(
     agent_instructions=FINANCE_INSTRUCTIONS,
     tools=[get_stock_price, place_trade],
     file_access_store=FileSystemAgentFileStore("working"),
-    auto_approval_rules=[FileAccessProvider.read_only_tools_auto_approval_rule],
+    auto_approval_rules=[
+        FileAccessProvider.read_only_tools_auto_approval_rule,
+        auto_approve_small_trades,
+    ],
 )
 
 
