@@ -132,9 +132,19 @@ async def auto_approve_small_trades(call: Content) -> bool:
         return False
 
     args = call.parse_arguments() or {}
-    qty = int(args.get("quantity", 0))
-    stock_price = get_stock_price(args["symbol"])
-    estimate = qtr * stock_price
+    symbol = str(args.get("symbol", "")).upper()
+    if not symbol:
+        return False
+
+    qty_raw = args.get("quantity", 0)
+    try:
+        qty = int(qty_raw)
+    except (TypeError, ValueError):
+        return False
+
+    price_data = get_stock_price(symbol)
+    price = float(price_data.get("price", 0.0))
+    estimate = qty * price
     # A trade less than $1000 can be auto approved.
     return estimate < 1000
 
