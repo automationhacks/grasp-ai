@@ -55,7 +55,7 @@ run_agent_async = console_module.run_agent_async
 
 load_dotenv()
 # Config
-PROJECT_ENDPOINT = os.environ.get("PROJECT_ENDPOINT")
+PROJECT_PROJECT_ENDPOINT = os.environ.get("FOUNDRY_PROJECT_ENDPOINT")
 FOUNDRY_MODEL = os.environ.get("FOUNDRY_MODEL")
 
 # instructions
