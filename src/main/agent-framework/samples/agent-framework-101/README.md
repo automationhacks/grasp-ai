@@ -21,3 +21,10 @@ gh repo clone microsoft/agent-framework
 ```
 
 - After setup, you can run `uv run <file>` under `src/main/agent-framework/samples/agent-framework-101` to spin up the desired example agent. The examples from 04 onwards follow the building your own claw blog series and would be in sync with [build_your_own_claw](https://github.com/microsoft/agent-framework/tree/main/python/samples/02-agents/harness/build_your_own_claw) series
+
+### Memory
+
+Microsoft Agent framework harness provides support for memory, there are 2 types:
+
+1. File memory: This is coarse, full file memory saved locally by the agent to capture notes, todos, watchlist etc.
+2. Foundry memory: These are small facts that are derived from the different chat sessions and stored in a memory store in foundry. These are extracted automatically from agent conversations as durable facts that can be reused later on. For e.g. this customer prefers low risk ETFs;and is saving money to buy his own house.

@@ -24,6 +24,7 @@ from agent_framework import (
     tool,
 )
 from agent_framework.foundry import FoundryChatClient
+from agent_framework_foundry import FoundryMemoryProvider
 from azure.identity import AzureCliCredential
 from dotenv import load_dotenv
 from pydantic import Field
@@ -154,6 +155,13 @@ client = FoundryChatClient(
     credential=AzureCliCredential(),
 )
 
+foundry_memory = FoundryMemoryProvider(
+    project_client=client,
+    memory_store_name=store_name,
+    scope="agent-harness-sample-user",
+    update_delay=0
+)
+
 # Agent harness
 agent = create_harness_agent(
     client=client,
@@ -164,6 +172,7 @@ agent = create_harness_agent(
         FileAccessProvider.read_only_tools_auto_approval_rule,
         auto_approve_small_trades,
     ],
+    context_providers=[foundry_memory]
 )
 
 
