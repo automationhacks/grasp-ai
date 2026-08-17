@@ -18,6 +18,7 @@ from typing import Annotated, Literal
 from uuid import uuid4
 
 from agent_framework import (
+    AgentModeProvider,
     Content,
     FileAccessProvider,
     FileSystemAgentFileStore,
@@ -30,7 +31,6 @@ from azure.identity import AzureCliCredential
 from dotenv import load_dotenv
 from pydantic import Field
 
-_MEMORY_SCOPE = "agent-harness-sample-user"
 # Reuse the shared harness console from a local agent-framework repo checkout.
 DEFAULT_HARNESS_DIR = (
     Path.home()
@@ -43,7 +43,11 @@ DEFAULT_HARNESS_DIR = (
 )
 _SAMPLE_DIR = Path(__file__).resolve().parent.parent
 _WORKING_DIR = _SAMPLE_DIR / "working"
+_MEMORY_SCOPE = "agent-harness-sample-user"
 
+# we are reusing the harness from agent-framework repo which should be also cloned.
+# please read the README.md file src/main/agent-framework/samples/agent-framework-101/README.md
+# for instructions
 HARNESS_DIR = Path(
     os.environ.get("AGENT_FRAMEWORK_HARNESS_DIR", str(DEFAULT_HARNESS_DIR))
 ).expanduser()
@@ -198,43 +202,46 @@ async def _enable_foundry_memory(stack: AsyncExitStack) -> FoundryMemoryProvider
     print(f"Foundry memory enabled (store: {store_name})")
     return provider
 
-# Setup
-client = FoundryChatClient(
-    credential=AzureCliCredential(),
-)
-
-foundry_memory = FoundryMemoryProvider(
-    project_client=client,
-    memory_store_name=store_name,
-    scope=_MEMORY_SCOPE,
-    update_delay=0
-)
-
-# Agent harness
-agent = create_harness_agent(
-    client=client,
-    agent_instructions=FINANCE_INSTRUCTIONS,
-    tools=[get_stock_price, place_trade],
-    file_access_store=FileSystemAgentFileStore("working"),
-    auto_approval_rules=[
-        FileAccessProvider.read_only_tools_auto_approval_rule,
-        auto_approve_small_trades,
-    ],
-    context_providers=[foundry_memory]
-)
-
 
 async def main() -> None:
     load_dotenv()
     _WORKING_DIR.mkdir(exist_ok=True)
 
-    await run_agent_async(
-        agent=agent,
-        session=agent.create_session(),
-        observers=build_observers_with_planning(agent),
-        initial_mode="plan",
-        title="Finance Assistant",
+    # Setup
+    client = FoundryChatClient(
+        credential=AzureCliCredential(),
     )
+
+    async with AsyncExitStack() as stack:
+        context_providers: list[Any] = []
+        foundry_memory = await _enable_foundry_memory(stack)
+        if foundry_memory is not None:
+            context_providers.append(foundry_memory)
+
+        # Agent harness
+        agent = create_harness_agent(
+            client=client,
+            agent_instructions=FINANCE_INSTRUCTIONS,
+            tools=[get_stock_price, place_trade],
+            file_access_store=FileSystemAgentFileStore(str(_WORKING_DIR)),
+            auto_approval_rules=[
+                FileAccessProvider.read_only_tools_auto_approval_rule,
+                auto_approve_small_trades,
+            ],
+            context_providers=context_providers or None,
+            mode_provider=AgentModeProvider(default_mode="execute")
+        )
+
+        session = agent.create_session()
+
+        await run_agent_async(
+            agent=agent,
+            session=session,
+            observers=build_observers_with_planning(agent),
+            initial_mode="execute",
+            title="Finance Assistant",
+            placeholder="Review your portfolio, draft a report, update your watchlist, or place a trade..."
+        )
 
 
 if __name__ == "__main__":
