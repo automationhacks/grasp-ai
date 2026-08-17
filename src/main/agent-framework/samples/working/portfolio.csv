@@ -1,0 +1,6 @@
+Ticker,Shares,PurchasePrice,CurrentPrice,AssetClass
+AAPL,15,150.25,185.50,Equity
+MSFT,10,310.00,420.75,Equity
+GOOGL,8,125.50,175.20,Equity
+AMZN,12,130.00,180.40,Equity
+BND,50,72.50,73.10,Fixed Income
