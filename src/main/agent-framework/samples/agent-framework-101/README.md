@@ -28,3 +28,7 @@ Microsoft Agent framework harness provides support for memory, there are 2 types
 
 1. File memory: This is coarse, full file memory saved locally by the agent to capture notes, todos, watchlist etc.
 2. Foundry memory: These are small facts that are derived from the different chat sessions and stored in a memory store in foundry. These are extracted automatically from agent conversations as durable facts that can be reused later on. For e.g. this customer prefers low risk ETFs;and is saving money to buy his own house.
+
+### Skills
+
+- You can create skills which can share know how on how to tackle different scenarios for your agents within agent framework, read [Give Your Agents Domain Expertise with Agent Skills in Microsoft Agent Framework by Sergey Menshykh](https://devblogs.microsoft.com/agent-framework/give-your-agents-domain-expertise-with-agent-skills-in-microsoft-agent-framework/) to understand more.
