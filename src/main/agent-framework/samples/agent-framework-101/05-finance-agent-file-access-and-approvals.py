@@ -7,6 +7,7 @@ https://github.com/microsoft/agent-framework/tree/main/python/samples/02-agents/
 """
 
 import asyncio
+from contextlib import AsyncExitStack
 import importlib
 import os
 import random
@@ -29,6 +30,7 @@ from azure.identity import AzureCliCredential
 from dotenv import load_dotenv
 from pydantic import Field
 
+_MEMORY_SCOPE = "agent-harness-sample-user"
 # Reuse the shared harness console from a local agent-framework repo checkout.
 DEFAULT_HARNESS_DIR = (
     Path.home()
@@ -39,6 +41,9 @@ DEFAULT_HARNESS_DIR = (
     / "02-agents"
     / "harness"
 )
+_SAMPLE_DIR = Path(__file__).resolve().parent.parent
+_WORKING_DIR = _SAMPLE_DIR / "working"
+
 HARNESS_DIR = Path(
     os.environ.get("AGENT_FRAMEWORK_HARNESS_DIR", str(DEFAULT_HARNESS_DIR))
 ).expanduser()
@@ -54,7 +59,6 @@ console_module = importlib.import_module("console")
 build_observers_with_planning = console_module.build_observers_with_planning
 run_agent_async = console_module.run_agent_async
 
-load_dotenv()
 # Config
 PROJECT_PROJECT_ENDPOINT = os.environ.get("FOUNDRY_PROJECT_ENDPOINT")
 FOUNDRY_MODEL = os.environ.get("FOUNDRY_MODEL")
@@ -150,6 +154,50 @@ async def auto_approve_small_trades(call: Content) -> bool:
     return estimate < 1000
 
 
+async def _enable_foundry_memory(stack: AsyncExitStack) -> FoundryMemoryProvider | None:
+    endpoint = os.environ.get("FOUNDRY_PROJECT_ENDPOINT")
+    store_name = os.environ.get("FOUNDRY_MEMORY_STORE")
+    embedding_model = os.environ.get("FOUNDRY_EMBEDDING_MODEL")
+    chat_model = os.environ.get("FOUNDRY_MODEL", "gpt-5.4")
+
+    if not (endpoint and store_name and embedding_model):
+        print("Foundry memory disabled. Set FOUNDRY_MEMORY_STORE and FOUNDRY_EMBEDDING_MODEL to enable it")
+        return None
+
+    from azure.ai.projects.aio import AIProjectClient
+    from azure.ai.projects.models import MemoryStoreDefaultDefinition, MemoryStoreDefaultOptions
+    from azure.core.exceptions import ResourceNotFoundError
+    from azure.identity.aio import AzureCliCredential as AsyncAzureCliCredential
+
+    credential = await stack.enter_async_context(AzureCliCredential())
+    project_client = await stack.enter_async_context(AIProjectClient(endpoint=endpoint, credential=credential))
+
+    try:
+        await project_client.beta.memory_stores.get(name=store_name)
+        print(f"Using existing memory store '{store_name}'")
+    except ResourceNotFoundError:
+        definition = MemoryStoreDefaultDefinition(
+            chat_model=chat_model,
+            embedding_model=embedding_model,
+            options=MemoryStoreDefaultOptions(
+                chat_summary_enabled=False, user_profile_enabled=True)
+        )
+        await project_client.beta.memory_stores.create(
+            name=store_name,
+            embedding_model=embedding_model,
+            options=MemoryStoreDefaultOptions(
+                chat_summary_enabled=False, user_profile_details=True)
+        )
+    provider = FoundryMemoryProvider(
+        project_client=project_client,
+        memory_store_name=store_name,
+        scope=_MEMORY_SCOPE,
+        # In production, memories should be batched with delay.
+        update_delay=0
+    )
+    print(f"Foundry memory enabled (store: {store_name})")
+    return provider
+
 # Setup
 client = FoundryChatClient(
     credential=AzureCliCredential(),
@@ -158,7 +206,7 @@ client = FoundryChatClient(
 foundry_memory = FoundryMemoryProvider(
     project_client=client,
     memory_store_name=store_name,
-    scope="agent-harness-sample-user",
+    scope=_MEMORY_SCOPE,
     update_delay=0
 )
 
@@ -177,6 +225,9 @@ agent = create_harness_agent(
 
 
 async def main() -> None:
+    load_dotenv()
+    _WORKING_DIR.mkdir(exist_ok=True)
+
     await run_agent_async(
         agent=agent,
         session=agent.create_session(),
