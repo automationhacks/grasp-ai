@@ -24,6 +24,7 @@ from agent_framework import (
     FileSystemAgentFileStore,
     create_harness_agent,
     tool,
+    SkillsProvider
 )
 from agent_framework.foundry import FoundryChatClient
 from agent_framework_foundry import FoundryMemoryProvider
@@ -217,6 +218,12 @@ async def main() -> None:
         foundry_memory = await _enable_foundry_memory(stack)
         if foundry_memory is not None:
             context_providers.append(foundry_memory)
+
+        skills_provider = SkillsProvider.from_paths(
+            skill_paths=[str(skills_dir)],
+            # below let's the skills scripts run
+            script_runner=subprocess_script_runner
+        )
 
         # Agent harness
         agent = create_harness_agent(
