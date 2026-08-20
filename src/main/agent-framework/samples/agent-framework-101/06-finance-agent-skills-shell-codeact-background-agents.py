@@ -14,8 +14,9 @@ import random
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 from uuid import uuid4
+import subprocess_script_runner
 
 from agent_framework import (
     AgentModeProvider,
@@ -42,8 +43,9 @@ DEFAULT_HARNESS_DIR = (
     / "02-agents"
     / "harness"
 )
-_SAMPLE_DIR = Path(__file__).resolve().parent.parent
+_SAMPLE_DIR = Path(__file__).resolve().parent
 _WORKING_DIR = _SAMPLE_DIR / "working"
+_SKILLS_DIR = _SAMPLE_DIR / "skills"
 _MEMORY_SCOPE = "agent-harness-sample-user"
 
 # we are reusing the harness from agent-framework repo which should be also cloned.
@@ -220,9 +222,9 @@ async def main() -> None:
             context_providers.append(foundry_memory)
 
         skills_provider = SkillsProvider.from_paths(
-            skill_paths=[str(skills_dir)],
+            skill_paths=[str(_SKILLS_DIR)],
             # below let's the skills scripts run
-            script_runner=subprocess_script_runner
+            script_runner=subprocess_script_runner.subprocess_script_runner
         )
 
         # Agent harness
@@ -236,7 +238,8 @@ async def main() -> None:
                 auto_approve_small_trades,
             ],
             context_providers=context_providers or None,
-            mode_provider=AgentModeProvider(default_mode="execute")
+            mode_provider=AgentModeProvider(default_mode="execute"),
+            skills_provider=skills_provider
         )
 
         session = agent.create_session()
