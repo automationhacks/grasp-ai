@@ -32,3 +32,30 @@ Microsoft Agent framework harness provides support for memory, there are 2 types
 ### Skills
 
 - You can create skills which can share know how on how to tackle different scenarios for your agents within agent framework, read [Give Your Agents Domain Expertise with Agent Skills in Microsoft Agent Framework by Sergey Menshykh](https://devblogs.microsoft.com/agent-framework/give-your-agents-domain-expertise-with-agent-skills-in-microsoft-agent-framework/) to understand more.
+
+```python
+from agent_framework import SkillsProvider
+
+skills_provider = SkillsProvider.from_paths(
+            skill_paths=[str(_SKILLS_DIR)],
+            # below let's the skills scripts run
+            script_runner=subprocess_script_runner.subprocess_script_runner
+        )
+
+agent = create_harness_agent(
+            client=client,
+            agent_instructions=FINANCE_INSTRUCTIONS,
+            tools=[get_stock_price, place_trade],
+            file_access_store=FileSystemAgentFileStore(str(_WORKING_DIR)),
+            auto_approval_rules=[
+                FileAccessProvider.read_only_tools_auto_approval_rule,
+                auto_approve_small_trades,
+            ],
+            context_providers=context_providers or None,
+            mode_provider=AgentModeProvider(default_mode="execute"),
+            # add the skills provider to creation of agent harness
+            skills_provider=skills_provider
+        )
+```
+
+You can also add skills in Foundry and then reuse them in your agent. When skills change, this would help prevent redeployment.
