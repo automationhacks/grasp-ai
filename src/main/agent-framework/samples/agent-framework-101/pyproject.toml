@@ -8,5 +8,6 @@ dependencies = [
     "agent-framework",
     "agent-framework-foundry",
     "azure-ai-projects>=2.4.0",
+    "mcp>=1.29.0",
     "textual>=8.2.8",
 ]

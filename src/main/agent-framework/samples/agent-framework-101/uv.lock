@@ -58,6 +58,7 @@ dependencies = [
     { name = "agent-framework" },
     { name = "agent-framework-foundry" },
     { name = "azure-ai-projects" },
+    { name = "mcp" },
     { name = "textual" },
 ]
 
@@ -66,6 +67,7 @@ requires-dist = [
     { name = "agent-framework" },
     { name = "agent-framework-foundry" },
     { name = "azure-ai-projects", specifier = ">=2.4.0" },
+    { name = "mcp", specifier = ">=1.29.0" },
     { name = "textual", specifier = ">=8.2.8" },
 ]
 
