@@ -31,7 +31,10 @@ Microsoft Agent framework harness provides support for memory, there are 2 types
 
 ### Skills
 
-- You can create skills which can share know how on how to tackle different scenarios for your agents within agent framework, read [Give Your Agents Domain Expertise with Agent Skills in Microsoft Agent Framework by Sergey Menshykh](https://devblogs.microsoft.com/agent-framework/give-your-agents-domain-expertise-with-agent-skills-in-microsoft-agent-framework/) to understand more.
+- There are 2 types of skills:
+  - **File based skills**: Skill files in your repo
+  - **Foundry based skills**: Skill files which lie in foundry and can be managed and edited there without making a repo change or re-deploying.
+- You can create skills which can share know how on how to tackle different scenarios for your agents within agent framework, read [Give Your Agents Domain Expertise with Agent Skills in Microsoft Agent Framework by Serhiy Menshykh](https://devblogs.microsoft.com/agent-framework/give-your-agents-domain-expertise-with-agent-skills-in-microsoft-agent-framework/) to understand more.
 
 ```python
 from agent_framework import SkillsProvider
