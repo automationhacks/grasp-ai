@@ -7,18 +7,22 @@ endpoint = "https://automationhacks-rg-resource.services.ai.azure.com/api/projec
 project = AIProjectClient(
     endpoint=endpoint, credential=DefaultAzureCredential())
 
+web_search_tool = WebSearchToolboxTool(name="web_search_tool")
+toolbox_search_tool = ToolSearchToolboxTool(name="toolbox_search_tool")
+mcp_toolbox_tool = MCPToolboxTool(
+    server_label="myserver",
+    server_url="https://agent-framework-learn.example.com",
+    require_approval="never",
+    project_connection_id="my-key-auth-connection"
+)
+
 toolbox_version = project.toolboxes.create_version(
     name="agent-framework-learn-toolbox",
     description="Toolbox with web search and an MCP server",
     tools=[
-        WebSearchToolboxTool(),
-        MCPToolboxTool(
-            server_label="myserver",
-            server_url="https://agent-framework-learn.example.com",
-            require_approval="never",
-            project_connection_id="my-key-auth-connection"
-        ),
-        ToolSearchToolboxTool(),
+        web_search_tool,
+        mcp_toolbox_tool,
+        toolbox_search_tool,
     ]
 )
 print(
