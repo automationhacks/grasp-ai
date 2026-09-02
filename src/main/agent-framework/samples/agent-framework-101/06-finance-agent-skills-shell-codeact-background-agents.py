@@ -1,6 +1,8 @@
 """
 This file follows tutorial from agent-framework on building your own agent with harness
-https://github.com/microsoft/agent-framework/blob/main/python/samples/02-agents/harness/build_your_own_claw/claw_step02_working_with_data.py
+
+Tutorial blog: https://devblogs.microsoft.com/agent-framework/agent-harness-scaling-the-claw-or-harness-capabilities/
+Github sample: https://github.com/microsoft/agent-framework/blob/main/python/samples/02-agents/harness/build_your_own_claw/claw_step03_scaling_capabilities.py
 
 It also makes use of console which is a terminal UI (TUI)
 https://github.com/microsoft/agent-framework/tree/main/python/samples/02-agents/harness/console
