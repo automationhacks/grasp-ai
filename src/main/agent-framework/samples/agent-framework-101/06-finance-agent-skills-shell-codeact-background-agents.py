@@ -31,6 +31,7 @@ from agent_framework import (
     FileAccessProvider,
     FileSkillsSource,
     FileSystemAgentFileStore,
+    MCPSkillsSource,
     create_harness_agent,
     tool,
     SkillsProvider,
@@ -234,7 +235,7 @@ async def _build_skills_provider(stack: AsyncExitStack) -> SkillsProvider:
     toolbox_url = os.environ.get("FOUNDRY_TOOLBOX_MCP_SERVER_URL")
     if toolbox_url:
         session = await _connect_foundry_toolbox(stack, toolbox_url)
-        sources.append(MCPSkillResource(client=session))
+        sources.append(MCPSkillsSource(client=session))
         print("Foundry skills enabled (Toobox MCP).")
     else:
         print("Foundry skills disabled. Set FOUNDRY_TOOLBOX_MCP_SERVER_URL to enable them")
@@ -253,7 +254,7 @@ async def _connect_foundry_toolbox(stack: AsyncExitStack, url: str) -> ClientSes
     http_client = await stack.enter_async_context(
         httpx.AsyncClient(
             auth=_ToolboxAuth(token_provider),
-            header={"Foundry-Features": "Toolboxes=V1Preview"},
+            headers={"Foundry-Features": "Toolboxes=V1Preview"},
             timeout=httpx.Timeout(30.0, read=300.0),
             follow_redirects=True
         )
