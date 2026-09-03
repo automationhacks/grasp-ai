@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Annotated, Any, Literal
 from uuid import uuid4
 
+from agents import LocalShellTool, ShellPolicy
 import httpx
 from mcp import ClientSession
 from mcp.client.streamable_http import streamable_http_client
@@ -58,6 +59,7 @@ DEFAULT_HARNESS_DIR = (
 )
 _SAMPLE_DIR = Path(__file__).resolve().parent
 _WORKING_DIR = _SAMPLE_DIR / "working"
+_VAULT_DIR = _WORKING_DIR / "confirmations"
 _SKILLS_DIR = _SAMPLE_DIR / "skills"
 _MEMORY_SCOPE = "agent-harness-sample-user"
 
@@ -266,6 +268,27 @@ async def _connect_foundry_toolbox(stack: AsyncExitStack, url: str) -> ClientSes
     return session
 
 
+def _build_shell() -> LocalShellTool:
+    """
+    A sandboxed shell, confined to trade confirmation vault
+
+    confine_workdir re-anchors each command to the vault
+    denylist prefilters any destructive command shapes
+    these patterns are a UX guardrail and not a security boundry
+    for hard isolation, use DockerShellTool
+    Left at default approval_mode="always_require" so each command is surfaced for approval.
+
+    """
+    return LocalShellTool(mode="persistent", workdir=str(_VAULT_DIR), confine_workdir=True, policy=ShellPolicy(denylist=[
+        r"\brm\s+-rf\b",
+        r"\bsudo\b",
+        r":\(\)\s*\{",  # fork-bomb shape
+        r"\bmkfs\b",
+        r">\s*/dev/sd",
+    ]),
+        timeout=15,)
+
+
 class _ToolboxAuth(httpx.Auth):
     """Attach a fresh foundry bearer token to every request"""
 
@@ -288,6 +311,7 @@ async def main() -> None:
 
     async with AsyncExitStack() as stack:
         skills_provider = await _build_skills_provider(stack)
+        shell = _build_shell()
 
         context_providers: list[Any] = []
         foundry_memory = await _enable_foundry_memory(stack)
@@ -306,7 +330,8 @@ async def main() -> None:
             ],
             context_providers=context_providers or None,
             mode_provider=AgentModeProvider(default_mode="execute"),
-            skills_provider=skills_provider
+            skills_provider=skills_provider,
+            shell_executor=shell,
         )
 
         session = agent.create_session()
