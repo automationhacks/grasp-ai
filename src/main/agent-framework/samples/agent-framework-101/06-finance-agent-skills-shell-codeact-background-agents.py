@@ -9,6 +9,7 @@ https://github.com/microsoft/agent-framework/tree/main/python/samples/02-agents/
 """
 
 import asyncio
+from collections.abc import Callable, Generator
 from contextlib import AsyncExitStack
 import importlib
 import os
@@ -21,6 +22,7 @@ from uuid import uuid4
 
 import httpx
 from mcp import ClientSession
+from mcp.client.streamable_http import streamable_http_client
 import subprocess_script_runner
 
 from agent_framework import (
@@ -39,7 +41,7 @@ from agent_framework import (
 )
 from agent_framework.foundry import FoundryChatClient
 from agent_framework_foundry import FoundryMemoryProvider
-from azure.identity import AzureCliCredential
+from azure.identity import AzureCliCredential, get_bearer_token_provider
 from dotenv import load_dotenv
 from pydantic import Field
 
@@ -251,7 +253,7 @@ async def _connect_foundry_toolbox(stack: AsyncExitStack, url: str) -> ClientSes
     http_client = await stack.enter_async_context(
         httpx.AsyncClient(
             auth=_ToolboxAuth(token_provider),
-            header="{"Foundry-Features": "Toolboxes=V1Preview"}",
+            header={"Foundry-Features": "Toolboxes=V1Preview"},
             timeout=httpx.Timeout(30.0, read=300.0),
             follow_redirects=True
         )
@@ -261,6 +263,17 @@ async def _connect_foundry_toolbox(stack: AsyncExitStack, url: str) -> ClientSes
     session = await stack.enter_async_context(ClientSession(read, write))
     await session.initialize()
     return session
+
+
+class _ToolboxAuth(httpx.Auth):
+    """Attach a fresh foundry bearer token to every request"""
+
+    def __init__(self, token_provider: Callable[[], str]):
+        self._get_token = token_provider
+
+    def auth_flow(self, request: httpx.Request) -> Generator[httpx.Request, httpx.Response, None]:
+        request.headers["Authorization"] = f"Bearer {self._get_token()}"
+        yield request
 
 
 async def main() -> None:
@@ -273,6 +286,8 @@ async def main() -> None:
     )
 
     async with AsyncExitStack() as stack:
+        skills_provider = await _build_skills_provider(stack)
+
         context_providers: list[Any] = []
         foundry_memory = await _enable_foundry_memory(stack)
         if foundry_memory is not None:
