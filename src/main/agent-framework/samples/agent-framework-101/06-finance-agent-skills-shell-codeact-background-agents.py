@@ -18,16 +18,24 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Annotated, Any, Literal
 from uuid import uuid4
+
+import httpx
+from mcp import ClientSession
 import subprocess_script_runner
 
 from agent_framework import (
     AgentModeProvider,
     Content,
     FileAccessProvider,
+    FileSkillsSource,
     FileSystemAgentFileStore,
     create_harness_agent,
     tool,
-    SkillsProvider
+    SkillsProvider,
+    SkillsSource,
+    AggregatingSkillsSource,
+    DeduplicatingSkillsSource,
+    MCPSkillResource
 )
 from agent_framework.foundry import FoundryChatClient
 from agent_framework_foundry import FoundryMemoryProvider
@@ -208,6 +216,53 @@ async def _enable_foundry_memory(stack: AsyncExitStack) -> FoundryMemoryProvider
     return provider
 
 
+async def _build_skills_provider(stack: AsyncExitStack) -> SkillsProvider:
+    """
+    Builds a skill provider over local skills/ folder, or optional Foundry managed skills
+
+    File based skills always load. When FOUNDRY_TOOLBOX_MCP_SERVER_URL is set, we
+    also connect to Foundry Toolbox MCP endpoint and surface its skills, so they can be
+    managed and updated centrally without changing this agent.
+    """
+
+    # subprocess_script_runner lets file based skills run their python scripts.
+    sources: list[SkillsSource] = [FileSkillsSource(
+        str(_SKILLS_DIR), script_runner=subprocess_script_runner)]
+
+    toolbox_url = os.environ.get("FOUNDRY_TOOLBOX_MCP_SERVER_URL")
+    if toolbox_url:
+        session = await _connect_foundry_toolbox(stack, toolbox_url)
+        sources.append(MCPSkillResource(client=session))
+        print("Foundry skills enabled (Toobox MCP).")
+    else:
+        print("Foundry skills disabled. Set FOUNDRY_TOOLBOX_MCP_SERVER_URL to enable them")
+
+    source: SkillsSource = sources[0] if len(
+        sources) == 1 else AggregatingSkillsSource(sources)
+    return SkillsProvider(DeduplicatingSkillsSource(source))
+
+
+async def _connect_foundry_toolbox(stack: AsyncExitStack, url: str) -> ClientSession:
+    """
+    Open an MCP session against Foundry Toolbox endpoint, tied to a stack's lifetime
+    """
+    token_provider = get_bearer_token_provider(
+        AzureCliCredential(), "https://ai.azure.com/.default")
+    http_client = await stack.enter_async_context(
+        httpx.AsyncClient(
+            auth=_ToolboxAuth(token_provider),
+            header="{"Foundry-Features": "Toolboxes=V1Preview"}",
+            timeout=httpx.Timeout(30.0, read=300.0),
+            follow_redirects=True
+        )
+    )
+
+    read, write, _ = await stack.enter_async_context(streamable_http_client(url=url, http_client=http_client))
+    session = await stack.enter_async_context(ClientSession(read, write))
+    await session.initialize()
+    return session
+
+
 async def main() -> None:
     load_dotenv()
     _WORKING_DIR.mkdir(exist_ok=True)
@@ -222,12 +277,6 @@ async def main() -> None:
         foundry_memory = await _enable_foundry_memory(stack)
         if foundry_memory is not None:
             context_providers.append(foundry_memory)
-
-        skills_provider = SkillsProvider.from_paths(
-            skill_paths=[str(_SKILLS_DIR)],
-            # below let's the skills scripts run
-            script_runner=subprocess_script_runner.subprocess_script_runner
-        )
 
         # Agent harness
         agent = create_harness_agent(
