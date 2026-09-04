@@ -20,7 +20,7 @@ from pathlib import Path
 from typing import Annotated, Any, Literal
 from uuid import uuid4
 
-from agents import LocalShellTool, ShellPolicy
+from agent_framework.tools import LocalShellTool, ShellPolicy
 import httpx
 from mcp import ClientSession
 from mcp.client.streamable_http import streamable_http_client
