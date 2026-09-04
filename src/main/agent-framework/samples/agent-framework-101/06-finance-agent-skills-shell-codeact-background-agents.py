@@ -43,6 +43,9 @@ from agent_framework import (
 )
 from agent_framework.foundry import FoundryChatClient
 from agent_framework_foundry import FoundryMemoryProvider
+# Monty is a pure cross platform interpreter that does not require hypervisor and is added
+# as a context provider to give agents an isolated sandbox to run code to arrive at an answer.
+from agent_framework_monty import MontyCodeActProvider
 from azure.identity import AzureCliCredential, get_bearer_token_provider
 from dotenv import load_dotenv
 from pydantic import Field
@@ -317,6 +320,8 @@ async def main() -> None:
         foundry_memory = await _enable_foundry_memory(stack)
         if foundry_memory is not None:
             context_providers.append(foundry_memory)
+        context_providers.append(MontyCodeActProvider(
+            approval_mode="always_require"))
 
         # Agent harness
         agent = create_harness_agent(
