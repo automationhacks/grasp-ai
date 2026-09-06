@@ -320,6 +320,9 @@ async def main() -> None:
         foundry_memory = await _enable_foundry_memory(stack)
         if foundry_memory is not None:
             context_providers.append(foundry_memory)
+
+        # Provide CodeAct i.e. a sandbox where AI written code can be executed safely
+        # In python, we use pydantic/monty module.
         context_providers.append(MontyCodeActProvider(
             approval_mode="always_require"))
 

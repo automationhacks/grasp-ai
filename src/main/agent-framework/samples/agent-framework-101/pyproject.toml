@@ -1,12 +1,13 @@
 [project]
 name = "agent-framework-101"
 version = "0.1.0"
-description = "Add your description here"
+description = "This folder contains samples on building agents with Microsoft agent framework and Microsoft Foundry."
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "agent-framework>=1.17.0",
     "agent-framework-foundry",
+    "agent-framework-hyperlight>=1.0.0b260730",
     "azure-ai-projects>=2.4.0",
     "mcp>=1.29.0",
     "textual>=8.2.8",
