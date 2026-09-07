@@ -11,6 +11,8 @@ from dotenv import load_dotenv
 """
 As of writing this, this code sample can only work on linux or windows
 as hyperlight is not supported on mac yet.
+
+Follows: https://github.com/microsoft/agent-framework/blob/main/python/packages/hyperlight/README.md
 """
 
 
