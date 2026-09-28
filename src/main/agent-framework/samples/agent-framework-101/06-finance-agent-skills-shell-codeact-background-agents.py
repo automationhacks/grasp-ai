@@ -21,6 +21,7 @@ from typing import Annotated, Any, Literal
 from uuid import uuid4
 
 from agent_framework.tools import LocalShellTool, ShellPolicy
+from agents import Agent
 import httpx
 from mcp import ClientSession
 from mcp.client.streamable_http import streamable_http_client
@@ -326,9 +327,18 @@ async def main() -> None:
         context_providers.append(MontyCodeActProvider(
             approval_mode="always_require"))
 
+        research_agent = Agent(
+            client,
+            name="TickerResearchAgent",
+            description="Searches the web for recent news about a single stock ticker",
+            instructions="You research a single ticker and return 3-4 factual bullet points",
+            tools=[client.get_web_search_tool()]
+        )
+
         # Agent harness
         agent = create_harness_agent(
             client=client,
+            background_agents=[research_agent],
             agent_instructions=FINANCE_INSTRUCTIONS,
             tools=[get_stock_price, place_trade],
             file_access_store=FileSystemAgentFileStore(str(_WORKING_DIR)),
