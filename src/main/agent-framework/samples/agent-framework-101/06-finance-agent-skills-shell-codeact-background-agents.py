@@ -327,8 +327,7 @@ async def main() -> None:
         context_providers.append(MontyCodeActProvider(
             approval_mode="always_require"))
 
-        research_agent = Agent(
-            client,
+        research_agent = client.as_agent(
             name="TickerResearchAgent",
             description="Searches the web for recent news about a single stock ticker",
             instructions="You research a single ticker and return 3-4 factual bullet points",
