@@ -16,7 +16,7 @@ cd grasp-ai/src/main/agent-framework/samples/fundamentals
 uv sync
 ```
 
-- We are using Microsoft Foundry to get models from. You will need to create an account and setup a project and a model in Foundry. You will need to create a resource group and a model from it. It would then give you couple of information like the endpoint and model to use. Create a `.env` file in `fundamentals` and add below env variables. Most of the standalone files would pick these by using `dotenv`
+- We are using Microsoft Foundry to get models from. You will need to create an account and setup a project and a model in Foundry. You will need to create a resource group and a model from it. It would then give you couple of information like the endpoint and model to use. Create a `.env` file in `fundamentals` and add below env variables. Most of the standalone files would pick these by using `dotenv`. If you are new to Foundry, I'll recommend following [Quickstart: Set up Microsoft Foundry resources](https://learn.microsoft.com/en-us/azure/foundry/tutorials/quickstart-create-foundry-resources?tabs=azurecli) to create required resources, project and deploy a model.
 
 ```shell
 FOUNDRY_PROJECT_ENDPOINT="https://<your-resource>.services.ai.azure.com/api/projects/<your-resource-group>"
