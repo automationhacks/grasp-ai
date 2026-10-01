@@ -13,6 +13,8 @@ from pydantic import Field
 load_dotenv()
 
 
+# We can configure approval to be always or never required; never_require is good for
+# demo purposes, in production apps, you should be mindful of the security hole.
 @tool(approval_mode="never_require")
 def get_weather(location: Annotated[str, Field(description="The location to get weather for")]) -> str:
     conditions = ["sunny", "cloudy", "rainy", "stormy"]
@@ -31,6 +33,8 @@ async def main() -> None:
         client=client,
         name="WeatherAgent",
         instructions=instructions,
+        # we can use the tools list to add different tool methods applicable for this
+        # particular agent
         tools=[get_weather]
     )
 
