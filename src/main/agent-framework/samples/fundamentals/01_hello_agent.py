@@ -10,12 +10,15 @@ load_dotenv()
 
 
 async def main() -> None:
+    # Initialize a Chat client for a model hosted in foundry
     client = FoundryChatClient(
         project_endpoint=os.environ.get("FOUNDRY_PROJECT_ENDPOINT"),
         model=os.environ.get("FOUNDRY_MODEL"),
         credential=AzureCliCredential(),
     )
 
+    # Create an Agent with the above client
+    # The agent class has options to configure different features like memory, background agents, tools etc
     agent = Agent(
         client=client,
         name="HelloAgent",
